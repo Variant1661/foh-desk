@@ -31,10 +31,24 @@ function database() {
         created_at TEXT NOT NULL
       );
       CREATE INDEX IF NOT EXISTS idx_timesheet_name_date ON timesheet_entries(name,date);
+      CREATE TABLE IF NOT EXISTS sessions (
+        token_hash TEXT PRIMARY KEY,
+        name TEXT NOT NULL CHECK(name IN ('FOH1','FOH2','FOH3','ADMIN')),
+        expires_at INTEGER NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at);
+      CREATE TABLE IF NOT EXISTS auth_attempts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL CHECK(name IN ('FOH1','FOH2','FOH3','ADMIN')),
+        attempted_at INTEGER NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_auth_attempts_name_time ON auth_attempts(name,attempted_at);
     `);
   }
   if (Date.now() - lastCleanup > 60_000) {
     connection.prepare("UPDATE messages SET body = '' WHERE expires_at <= ? AND body <> ''").run(new Date().toISOString());
+    connection.prepare("DELETE FROM sessions WHERE expires_at <= ?").run(Date.now());
+    connection.prepare("DELETE FROM auth_attempts WHERE attempted_at <= ?").run(Date.now() - 15 * 60_000);
     lastCleanup = Date.now();
   }
   return connection;

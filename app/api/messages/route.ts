@@ -1,7 +1,9 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { sessionName } from "@/lib/auth";
 
 export async function POST(request: Request) {
+  if (!await sessionName()) return NextResponse.json({ error: "Sign in to create a message." }, { status: 401 });
   let body: unknown;
   try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid request." }, { status: 400 }); }
   const message = (body as { message?: unknown })?.message;
