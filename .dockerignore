@@ -1,0 +1,11 @@
+node_modules
+.next
+data
+*.zip
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+.git
