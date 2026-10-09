@@ -1,0 +1,13 @@
+services:
+  foh-desk:
+    build: .
+    restart: unless-stopped
+    environment:
+      FOH_DB_PATH: /data/foh.sqlite
+      NODE_ENV: production
+    volumes:
+      - foh-data:/data
+    ports:
+      - "3000:3000"
+volumes:
+  foh-data:
